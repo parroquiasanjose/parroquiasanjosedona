@@ -26,9 +26,9 @@
     <!-- Contenedor Principal -->
     <div class="w-full max-w-md mx-auto p-6 md:p-8 bg-white rounded-2xl shadow-lg text-center">
         
-        <!-- Logo de la Parroquia -->
+        <!-- Logo de la Parroquia (Tamaño aumentado) -->
         <div class="mx-auto mb-6">
-            <img src="https://i.ibb.co/679rkH5/NUEVO-LOGO.png" alt="Logo Parroquia San José" class="h-24 w-24 mx-auto" border="0" onerror="this.onerror=null;this.src='https://placehold.co/96x96/e0e0e0/333?text=Logo';">
+            <img src="https://i.postimg.cc/50BvZ245/NUEVO-LOGO.png" alt="Logo Parroquia San José" class="h-32 w-32 mx-auto" border="0" onerror="this.onerror=null;this.src='https://placehold.co/128x128/e0e0e0/333?text=Logo';">
         </div>
 
         <!-- Títulos -->
@@ -38,15 +38,15 @@
 
         <!-- Contenedor de Botones -->
         <div class="flex flex-col space-y-4">
-            <!-- Botón de Mercado Pago con degradado -->
-            <a href="mercadopago://transferir/enviar?alias=p.sanjoselibres" class="w-full bg-gradient-to-r from-[#00b4f5] to-[#009EE3] hover:from-[#009EE3] hover:to-[#008acb] text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
+            <!-- Botón de Mercado Pago (ahora controlado por JavaScript) -->
+            <button id="mercadoPagoBtn" class="w-full bg-gradient-to-r from-[#00b4f5] to-[#009EE3] hover:from-[#009EE3] hover:to-[#008acb] text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
                 <!-- Logo de Mercado Pago -->
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     <path d="M18.392 4.05H5.608C4.72 4.05 4 4.77 4 5.658v12.684c0 .888.72 1.608 1.608 1.608h12.784c.888 0 1.608-.72 1.608-1.608V5.658c0-.888-.72-1.608-1.608-1.608zM12 15.16a3.16 3.16 0 1 1 0-6.32 3.16 3.16 0 0 1 0 6.32z"/>
                     <path d="M12.012 2.001C5.933 2.001 1 6.31 1 11.673c0 5.004 4.21 9.25 9.83 9.645.22.015.441.022.657.022 6.08 0 11.012-4.31 11.012-9.667C22.5 6.31 18.09 2 12.012 2zM12 16.77c-2.822 0-5.11-2.288-5.11-5.11s2.288-5.11 5.11-5.11 5.11 2.288 5.11 5.11-2.288 5.11-5.11 5.11z"/>
                 </svg>
                 <span>Donar con Mercado Pago</span>
-            </a>
+            </button>
             
             <!-- Botón para ver Alias con degradado -->
             <button id="openAliasBtn" class="w-full bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
@@ -65,8 +65,9 @@
             <div class="relative bg-gray-100 rounded-lg p-4 mb-4">
                 <p id="aliasText" class="text-gray-900 font-mono text-lg break-words">p.sanjoselibres</p>
                 <button id="copyBtn" class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 hover:text-blue-600 p-2 rounded-md">
+                    <!-- Icono de Copiar CORREGIDO -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 S0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
                 </button>
             </div>
@@ -96,6 +97,7 @@
         const copyBtn = document.getElementById('copyBtn');
         const aliasText = document.getElementById('aliasText');
         const copyMessage = document.getElementById('copyMessage');
+        const mercadoPagoBtn = document.getElementById('mercadoPagoBtn'); // Nuevo botón
 
         // --- Funciones para el Modal ---
         const openModal = () => {
@@ -119,35 +121,44 @@
         const copyToClipboard = () => {
             const textToCopy = aliasText.innerText;
             
-            // Crear un elemento de texto temporal para copiar
             const tempTextArea = document.createElement('textarea');
             tempTextArea.value = textToCopy;
             document.body.appendChild(tempTextArea);
             tempTextArea.select();
             
             try {
-                // Usar document.execCommand para mayor compatibilidad
                 document.execCommand('copy');
-                // Mostrar mensaje de éxito
                 copyMessage.textContent = '¡Alias copiado!';
             } catch (err) {
                 console.error('Error al intentar copiar el texto: ', err);
                 copyMessage.textContent = 'Error al copiar';
             }
             
-            // Limpiar
             document.body.removeChild(tempTextArea);
             
-            // Ocultar el mensaje después de 2 segundos
             setTimeout(() => {
                 copyMessage.textContent = '';
             }, 2000);
+        };
+
+        // --- Lógica para el botón de Mercado Pago ---
+        const handleMercadoPagoClick = () => {
+            const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                // Si es un dispositivo móvil, intenta abrir la app
+                window.location.href = 'mercadopago://transferir/enviar?alias=p.sanjoselibres';
+            } else {
+                // Si es una computadora, abre el modal con la información del alias
+                openModal();
+            }
         };
 
         // --- Asignación de Eventos ---
         openAliasBtn.addEventListener('click', openModal);
         closeAliasBtn.addEventListener('click', closeModal);
         copyBtn.addEventListener('click', copyToClipboard);
+        mercadoPagoBtn.addEventListener('click', handleMercadoPagoClick); // Nuevo evento
 
         // Cerrar el modal si se hace clic fuera del contenido
         aliasModal.addEventListener('click', (event) => {
